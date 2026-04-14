@@ -8,7 +8,6 @@ function [features, labels] = extractFeatures(audioFiles)
         OverlapLength=overlapLength,            ...
         SampleRate=fs,                          ...
         mfcc=true,                              ...
-        pitch=false,                            ...
         shortTimeEnergy=true,                   ...
         zerocrossrate=true                      ...
     );
@@ -16,18 +15,10 @@ function [features, labels] = extractFeatures(audioFiles)
 
     features        = [];
     labels          = [];
-    energyThreshold = 0.005;
-    zcrThreshold    = 0.2;
     allFeatures     = extract(aFE, audioFiles);
     allLabels       = audioFiles.Labels;
     for i = 1:length(allFeatures)
         currFeature = allFeatures{i};
-
-        % Remove parts without speech
-        isSpeech = currFeature(:, fMap.shortTimeEnergy)   > energyThreshold;
-        isVoiced = currFeature(:, fMap.zerocrossrate)     < zcrThreshold;
-        voicedSpeech = isSpeech & isVoiced;
-        currFeature(~voicedSpeech, :) = [];
 
         % Remove zerocrossrate and shortTimeEnergy
         currFeature(:, [fMap.zerocrossrate, fMap.shortTimeEnergy]) = [];

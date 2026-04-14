@@ -1,8 +1,7 @@
 function classifier = trainFeatures(nomTrainFeatures, nomTrainLabels)
     % K-nearest algorithm time!!
     % {FITCKNN} = {FITClassifierK-NearestNeighbor}
-    k = 1; 
-    size(nomTrainFeatures)
+    k = 21;
     classifier = fitcknn(nomTrainFeatures, nomTrainLabels,  ... 
         Distance="euclidean",               ...
         NumNeighbors=k,                     ...
