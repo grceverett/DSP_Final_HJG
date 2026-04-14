@@ -10,9 +10,10 @@ function main
     [nomTrainFeatures, nomTrainLabels]  = extractFeatures(nomTrain);
 
     % Train model
-    classifier = trainFeatures(nomTrainFeatures, nomTrainLabels);
+    classifier = trainFeatures(nomTrainFeatures, nomTrainLabels,33);
 
     % Validation    --- TODO
+    [percentage, k] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal);
 
     % Test model
     [nomAccuracy, nomCount]= testModel(classifier, nomTest, 'Nominal');
