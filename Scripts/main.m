@@ -5,11 +5,22 @@ function main
     % List nominal & intruder speakers
     printSpeakers(nomTest, intTest)
 
-    % Extract features | Output is array of data from windows
-    [features, labels] = extractFeatures(nomTrain);
+    %% Extract features | Output is array of data from windows
+    % Nominal Train | Nominal Val | Intruder Val
+    [nomTrainFeatures, nomTrainLabels]  = extractFeatures(nomTrain);
 
+    % Train model
+    classifier = trainFeatures(nomTrainFeatures, nomTrainLabels);
 
-    % Train model   --- TODO
+    % Validation    --- TODO
 
-    % Test model    --- TODO
-    
+    % Test model
+    [nomAccuracy, nomCount]= testModel(classifier, nomTest, 'Nominal');
+    % nomAccuracy = testModel(classifier, nomTrain, 'Nominal');
+    [intAccuracy, intCount] = testModel(classifier, intTest, 'Intruder');
+
+    % Print results
+    totalAccuracy = (nomAccuracy*nomCount + intAccuracy*intCount) / (nomCount+intCount);
+    fprintf('Model is %.1f%% Accurate \n', totalAccuracy);
+    fprintf('--Nominal test accuracy:   %.1f%% \n', nomAccuracy);
+    fprintf('--Intruder test accuracy:  %.1f%% \n', intAccuracy);

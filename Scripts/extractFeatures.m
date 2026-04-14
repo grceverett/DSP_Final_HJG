@@ -8,7 +8,7 @@ function [features, labels] = extractFeatures(audioFiles)
         OverlapLength=overlapLength,            ...
         SampleRate=fs,                          ...
         mfcc=true,                              ...
-        pitch=true,                             ...
+        pitch=false,                            ...
         shortTimeEnergy=true,                   ...
         zerocrossrate=true                      ...
     );
@@ -20,7 +20,6 @@ function [features, labels] = extractFeatures(audioFiles)
     zcrThreshold    = 0.2;
     allFeatures     = extract(aFE, audioFiles);
     allLabels       = audioFiles.Labels;
-    
     for i = 1:length(allFeatures)
         currFeature = allFeatures{i};
 
@@ -40,8 +39,3 @@ function [features, labels] = extractFeatures(audioFiles)
         features    = [features; currFeature];
         labels      = [labels, label];
     end
-
-    % Normalize data
-    meanOfFeatures = mean(features, 1);
-    stdOfFeatures = std(features,[], 1);
-    features = (features-meanOfFeatures)./stdOfFeatures;
