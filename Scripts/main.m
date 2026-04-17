@@ -9,16 +9,13 @@ function main
     % Nominal Train | Nominal Val | Intruder Val
     [nomTrainFeatures, nomTrainLabels]  = extractFeatures(nomTrain);
 
-    % Train model
-    classifier = trainFeatures(nomTrainFeatures, nomTrainLabels,33);
-
     % Validation    --- TODO
-    [percentage, k] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal);
+    [classifier, bestThreshold] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal);
 
     % Test model
-    [nomAccuracy, nomCount]= testModel(classifier, nomTest, 'Nominal');
+    [nomAccuracy, nomCount]= testModel(classifier, nomTest, 'Nominal',bestThreshold);
     % nomAccuracy = testModel(classifier, nomTrain, 'Nominal');
-    [intAccuracy, intCount] = testModel(classifier, intTest, 'Intruder');
+    [intAccuracy, intCount] = testModel(classifier, intTest, 'Intruder',bestThreshold);
 
     % Print results
     totalAccuracy = (nomAccuracy*nomCount + intAccuracy*intCount) / (nomCount+intCount);

@@ -1,4 +1,4 @@
-function [percentage, k] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal)
+function [classifier,bestThreshold, k] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal)
 %
 % 
 %
@@ -35,10 +35,58 @@ end
 [~, bestIdx] = max(score);
 
 best_k = 2^bestIdx + 1;
-percentage = intruderAvg(bestIdx); % Taking the bottom works the best
+% Subtracting the standard deviation fromt the nominal average to find the
+% best percentage.
+percentage = nominalAvg(bestIdx)-nominalStdArr(n); 
 
 % Display
 fprintf('Best n: %d\n', bestIdx);
 fprintf('Best k: %d\n', best_k);
-fprintf('Gap: %.4f\n', abs(nominalAvg(bestIdx) - intruderAvg(bestIdx)));
 fprintf('Final Accuracy: %.4f\n', percentage);
+
+classifier = trainFeatures(nomTrainFeatures, nomTrainLabels, best_k);
+
+% --- STEP 1: Coarse search ---
+thresholds = 0.1:0.1:0.9;
+
+for i = 1:length(thresholds)
+
+    [nomAcc, ~] = testModel(classifier, nomTest, "Nominal", thresholds(i));
+    [intAcc, ~] = testModel(classifier, intVal, "Intruder", thresholds(i));
+
+    accuracies(i) = (20*nomAcc + 8*intAcc) /28;
+
+    fprintf('Threshold %.2f -> Accuracy %.2f%%\n', thresholds(i), accuracies(i));
+end
+
+% --- STEP 2: Find best two neighbors ---
+[~, idx] = sort(accuracies, 'descend');
+
+t1 = thresholds(idx(1));
+t2 = thresholds(idx(2));
+if(t1>t2)
+    hold = t2;
+    t2=t1;
+    t1=hold;
+end
+
+fprintf('\nRefining between %.2f and %.2f\n', t1, t2);
+
+% --- STEP 3: Fine search ---
+fineThresholds = linspace(t1, t2+0.1, 20);
+
+for i = 1:length(fineThresholds)
+    [nomAcc, ~] = testModel(classifier, nomTest, "Nominal", fineThresholds(i));
+    [intAcc, ~] = testModel(classifier, intVal, "Intruder", fineThresholds(i));
+
+    fineAcc(i) = (20*nomAcc + 8*intAcc) / 28;
+end
+
+% --- STEP 4: Best result ---
+[bestAccuracy, bestIdx] = max(fineAcc);
+bestThreshold = fineThresholds(bestIdx);
+
+fprintf('\nBest Threshold: %.4f\n', bestThreshold);
+fprintf('Best Accuracy: %.2f%%\n', bestAccuracy);
+
+end

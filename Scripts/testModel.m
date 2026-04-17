@@ -1,4 +1,4 @@
-function [accuracy, numFiles] = testModel(classifier, testDatastore, expectedType)
+function [accuracy, numFiles] = testModel(classifier, testDatastore, expectedType, confThreshold)
     % Loop through each file in the datastore
     numFiles = length(testDatastore.Files);
     correct = 0;
@@ -21,11 +21,9 @@ function [accuracy, numFiles] = testModel(classifier, testDatastore, expectedTyp
         
         % Calculate intruder threshold per window
         maxScores = max(scores, [], 2);
-<<<<<<< Updated upstream
-        isIntruder = maxScores < 0.48;
-=======
-        isIntruder = maxScores < 0.43;
->>>>>>> Stashed changes
+
+        isIntruder = maxScores < confThreshold;
+
         
         % --- File-Level Estimate (Majority Vote) ---
         % Find percentage of frames flagged as intruder
