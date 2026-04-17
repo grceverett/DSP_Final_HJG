@@ -1,3 +1,4 @@
+function [classifier,bestThreshold] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal)
 % validation - Selects the best KNN classifier and decision threshold using
 %              a nominal vs. intruder separation strategy.
 %
@@ -10,8 +11,7 @@
 % Outputs:
 %   classifier     - Trained KNN classifier using the best k found
 %   bestThreshold  - Decision threshold that maximizes weighted accuracy
-%   k              - Final k value used in the best classifier
-function [classifier,bestThreshold, k] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal)
+%
 
 % Try k values of the form 2^n + 1 for n = 1 to 10
 for n = 1:10
