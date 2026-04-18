@@ -1,4 +1,4 @@
-function [classifier,bestThreshold] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal)
+function [classifier,bestThreshold] = validation(nomTrainFeatures, nomTrainLabels, nomVal, intVal)
 % validation - Selects the best KNN classifier and decision threshold using
 %              a nominal vs. intruder separation strategy.
 %
@@ -14,14 +14,16 @@ function [classifier,bestThreshold] = validation(nomTrainFeatures, nomTrainLabel
 %
 
 % Try k values of the form 2^n + 1 for n = 1 to 10
+k_values = [];
 for n = 1:10
     k = 2^n + 1;
+    k_values = [k_values, k];
 % Train classifier
     classifier = trainFeatures(nomTrainFeatures, nomTrainLabels, k);
 
 % --- Nominal ---
     % Validate classifier on nominal test set and store mean accuracy and std
-    [nomAcc, nomStdVals] = validateModel(classifier, nomTest);
+    [nomAcc, nomStdVals] = validateModel(classifier, nomVal);
     nominalAvg(n) = mean(nomAcc)
     nominalStdArr(n) = mean(nomStdVals);
 
@@ -48,6 +50,14 @@ end
 [~, bestIdx] = max(score);
 best_k = 2^bestIdx + 1;
 
+% --- Plot Coarse Search Accuracies ---
+figure;
+loglog(k_values, abs(score), '-o', 'LineWidth', 2, 'MarkerFaceColor', 'b');
+xlabel('k-values');
+ylabel('Score');
+title('k-Value Search');
+grid on;
+
 % Subtracting the standard deviation fromt the nominal average to find the
 % best percentage.
 percentage = nominalAvg(bestIdx)-nominalStdArr(n);
@@ -66,7 +76,7 @@ thresholds = 0.1:0.1:0.9;
 
 for i = 1:length(thresholds)
     % Test both sets at this threshold
-    [nomAcc, ~] = testModel(classifier, nomTest, "Nominal", thresholds(i));
+    [nomAcc, ~] = testModel(classifier, nomVal, "Nominal", thresholds(i));
     [intAcc, ~] = testModel(classifier, intVal, "Intruder", thresholds(i));
 
     % Weighted accuracy: nominal set has 20 samples, intruder has 8
@@ -102,7 +112,7 @@ fprintf('\nRefining between %.2f and %.2f\n', t1, t2);
 fineThresholds = linspace(t1, t2+0.1, 20);
 
 for i = 1:length(fineThresholds)
-    [nomAcc, ~] = testModel(classifier, nomTest, "Nominal", fineThresholds(i));
+    [nomAcc, ~] = testModel(classifier, nomVal, "Nominal", fineThresholds(i));
     [intAcc, ~] = testModel(classifier, intVal, "Intruder", fineThresholds(i));
 
     % Weighted accuracy using same sample counts as coarse search
@@ -122,6 +132,7 @@ grid on;
 [bestAccuracy, bestIdx] = max(fineAcc);
 bestThreshold = fineThresholds(bestIdx);
 
-fprintf('\nBest Threshold: %.4f\n', bestThreshold);
-fprintf('Best Accuracy: %.2f%%\n', bestAccuracy);
+fprintf('\nBest Threshold:  %.4f\n', bestThreshold);
+fprintf('Best k-value:      %i\n', best_k);
+fprintf('Best Accuracy:     %.2f%%\n', bestAccuracy);
 end

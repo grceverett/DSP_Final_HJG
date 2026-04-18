@@ -1,18 +1,16 @@
 function main
-    % Define samples
+    %% Define samples
     [nomTrain, nomVal, nomTest, intVal, intTest] = getFiles;
-    
-    % List nominal & intruder speakers
-    printSpeakers(nomTest, intTest)
+    printSpeakers(nomTest, intTest) % List nominal & intruder speakers
 
     %% Extract features | Output is array of data from windows
     % Nominal Train | Nominal Val | Intruder Val
     [nomTrainFeatures, nomTrainLabels]  = extractFeatures(nomTrain);
 
-    % Validation    --- TODO
+    %% Validation
     [classifier, bestThreshold] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal);
 
-    % Test model
+    %% Test model
     [nomAccuracy, nomCount]= testModel(classifier, nomTest, 'Nominal',bestThreshold);
     % nomAccuracy = testModel(classifier, nomTrain, 'Nominal');
     [intAccuracy, intCount] = testModel(classifier, intTest, 'Intruder',bestThreshold);
