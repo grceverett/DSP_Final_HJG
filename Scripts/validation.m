@@ -52,7 +52,7 @@ best_k = 2^bestIdx + 1;
 
 % --- Plot Coarse Search Accuracies ---
 figure;
-loglog(k_values, abs(score), '-o', 'LineWidth', 2, 'MarkerFaceColor', 'b');
+loglog(k_values, score, '-o', 'LineWidth', 2, 'MarkerFaceColor', 'b');
 xlabel('k-values');
 ylabel('Score');
 title('k-Value Search');
