@@ -8,7 +8,7 @@ function main
     [nomTrainFeatures, nomTrainLabels]  = extractFeatures(nomTrain);
 
     %% Validation
-    [classifier, bestThreshold] = validation(nomTrainFeatures, nomTrainLabels, nomTest, intVal);
+    [classifier, bestThreshold] = validation(nomTrainFeatures, nomTrainLabels, nomVal, intVal);
 
     %% Test model
     [nomAccuracy, nomCount]= testModel(classifier, nomTest, 'Nominal',bestThreshold);

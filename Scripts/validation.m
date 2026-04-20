@@ -24,22 +24,22 @@ for n = 1:10
 % --- Nominal ---
     % Validate classifier on nominal test set and store mean accuracy and std
     [nomAcc, nomStdVals] = validateModel(classifier, nomVal);
-    nominalAvg(n) = mean(nomAcc)
+    nominalAvg(n) = mean(nomAcc);
     nominalStdArr(n) = mean(nomStdVals);
 
 % --- Intruder ---
     % Validate classifier on intruder set and store mean accuracy and std
     [intAcc, intStdVals] = validateModel(classifier, intVal);
-    intruderAvg(n) = mean(intAcc)
+    intruderAvg(n) = mean(intAcc);
     intruderStdArr(n) = mean(intStdVals);
 
 % --- Compute gap ---
     % Larger gap means the classifier better separates nominal from intruder
-    gap = abs(nominalAvg(n) - intruderAvg(n))
+    gap = abs(nominalAvg(n) - intruderAvg(n));
 
 % --- Average std ---
     % Average spread across both sets; lower is more consistent
-    avgStd = (nominalStdArr(n) + intruderStdArr(n)) / 2
+    avgStd = (nominalStdArr(n) + intruderStdArr(n)) / 2;
 
 % --- Final score ---
     % Reward separation, penalize variance
@@ -93,23 +93,16 @@ title('Coarse Threshold Search');
 grid on;
 
 % --- STEP 2: Find the best two points ---
-% Sort thresholds by accuracy and pick the top two for fine search bounds
+% Sort thresholds by accuracy and pick the top threshold for fine search
 [~, idx] = sort(accuracies, 'descend');
-t1 = thresholds(idx(1));
-t2 = thresholds(idx(2));
+t = thresholds(idx(1));
 
-% Ensure t1 is the lower bound and t2 is the upper bound
-if(t1>t2)
-    hold = t2;
-    t2=t1;
-    t1=hold;
-end
 
-fprintf('\nRefining between %.2f and %.2f\n', t1, t2);
+fprintf('\nRefining between %.2f and %.2f\n', t-0.1, t+0.1);
 
 % --- STEP 3: Fine search ---
-% Search 20 evenly spaced thresholds between the two best coarse values
-fineThresholds = linspace(t1, t2+0.1, 20);
+% Search 20 evenly spaced thresholds close to the best coarse value
+fineThresholds = linspace(t-0.1, t+0.1, 20);
 
 for i = 1:length(fineThresholds)
     [nomAcc, ~] = testModel(classifier, nomVal, "Nominal", fineThresholds(i));
