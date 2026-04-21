@@ -1,0 +1,1 @@
+Type main in terminal and run.
